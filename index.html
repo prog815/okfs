@@ -34,6 +34,7 @@
   }
   a{color:var(--accent-text)}
   .wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+  [hidden]{display:none!important}
 
   /* header */
   .hero{padding:18px 0 6px}
@@ -58,9 +59,9 @@
   }
   .chip:hover{background:var(--accent-weak);border-color:var(--accent)}
 
-  /* sticky search panel */
+  /* search panel */
   .panel{
-    position:sticky;top:0;z-index:30;background:rgba(255,255,255,.92);
+    background:rgba(255,255,255,.92);
     backdrop-filter:saturate(1.1) blur(6px);
     border-bottom:1px solid var(--line);padding:12px 0;margin-top:0;
   }
@@ -80,24 +81,28 @@
   }
   .clear:hover{background:var(--accent-weak);color:var(--accent-text)}
   .searchbox.has-val .clear{display:block}
-  select#section, .lvlgrp{
+  select#section{
     padding:9px 12px;border:1px solid var(--line-strong);border-radius:10px;
     background:var(--panel);font:inherit;font-size:14px;color:var(--text);cursor:pointer;
   }
   select#section:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-weak)}
-  .lvlgrp{display:inline-flex;gap:10px;align-items:center;flex-wrap:wrap;cursor:default}
-  .lvlgrp .cap{color:var(--muted);font-size:13px}
-  .lvlgrp label{display:inline-flex;gap:5px;align-items:center;cursor:pointer;user-select:none;
-    border-radius:8px;padding:2px 6px}
-  .lvlgrp label:hover{background:var(--accent-weak)}
-  .lvlgrp input{accent-color:var(--lvl,var(--accent));width:15px;height:15px}
-  .lvlgrp .dot{width:9px;height:9px;border-radius:50%;background:var(--lvl,var(--accent));display:inline-block}
 
   /* status line */
   .statusline{display:flex;justify-content:space-between;gap:12px;align-items:baseline;flex-wrap:wrap;
     color:var(--muted);font-size:13px;padding:2px 2px 0}
   .statusline .found b{color:var(--text)}
-  .statusline .date{white-space:nowrap;text-align:right}
+  
+  .reset-link {
+    font-size: 13px;
+    color: var(--muted);
+    text-decoration: underline dashed;
+    text-underline-offset: 3px;
+    white-space: nowrap;
+    transition: color .15s;
+  }
+  .reset-link:hover {
+    color: var(--accent-text);
+  }
 
   /* results */
   main{padding:14px 0 30px}
@@ -124,44 +129,32 @@
     border:1px solid transparent;border-radius:8px;padding:4px 9px;cursor:pointer;white-space:nowrap;
   }
   .code:hover{border-color:var(--sec,var(--accent))}
-  .copy-full{
-    margin-left:auto;border:1px dashed var(--line-strong);background:#fbfcfb;color:var(--muted);
+  
+  .card-actions{display:flex;flex-wrap:wrap;gap:8px;margin-left:auto;align-items:center}
+  .btn-small{
+    display:inline-flex;align-items:center;gap:4px;
+    border:1px dashed var(--line-strong);background:#fbfcfb;color:var(--muted);
     border-radius:8px;padding:4px 9px;cursor:pointer;font:inherit;font-size:13px;white-space:nowrap;
+    transition: background .15s, border-color .15s;
   }
-  .copy-full:hover{border-color:var(--accent);color:var(--accent-text);background:var(--accent-weak)}
+  .btn-small:hover{border-color:var(--accent);color:var(--accent-text);background:var(--accent-weak)}
+
   .badge{
     font:inherit;font-size:12px;border-radius:999px;padding:4px 10px;cursor:pointer;
     border:1px solid transparent;white-space:nowrap;
   }
-  .badge-level{background:var(--lvl-bg,var(--l1-bg));color:var(--lvl-fg,var(--l1-fg));border-color:var(--lvl,var(--l1))}
-  .badge-level:hover{filter:brightness(.97)}
+  .badge-level{background:var(--lvl-bg,var(--l1-bg));color:var(--lvl-fg,var(--l1-fg));border-color:var(--lvl,var(--l1)); cursor:default}
   .badge-section{background:var(--sec-bg,var(--accent-weak));color:var(--sec-fg,var(--accent-text));border-color:var(--sec,var(--accent))}
   .badge-section:hover{filter:brightness(.97)}
   .name{margin-top:9px;font-size:15px}
   .rel-row{margin-top:8px;font-size:13.5px;display:flex;flex-wrap:wrap;gap:6px;align-items:baseline}
   .rel-row .rel-lbl{color:var(--muted)}
-  .path{margin-top:6px;font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px;align-items:center}
   .path-item{
     font-family:var(--mono);font-size:12.5px;background:var(--accent-weak);color:var(--accent-text);
     border:1px solid transparent;border-radius:6px;padding:2px 7px;cursor:pointer;white-space:nowrap;
   }
   .path-item:hover{border-color:var(--accent)}
   .path-item.cur{background:transparent;color:var(--text);font-weight:700;cursor:default;border-color:transparent}
-  .path-sep{opacity:.5}
-  .child-details{margin-top:9px;border-top:1px dashed var(--line);padding-top:8px}
-  .child-details summary{
-    cursor:pointer;color:var(--accent-text);font-size:13.5px;font-weight:600;
-    border-radius:8px;padding:3px 4px;user-select:none;
-  }
-  .child-details summary:hover{background:var(--accent-weak)}
-  .child-details ul{list-style:none;margin:7px 0 0;padding:0;display:flex;flex-direction:column;gap:4px}
-  .child-item{display:flex;gap:8px;align-items:baseline}
-  .child-item .ci-code{
-    font-family:var(--mono);font-size:12.5px;background:var(--accent-weak);color:var(--accent-text);
-    border-radius:6px;padding:1px 7px;cursor:pointer;border:1px solid transparent;white-space:nowrap;
-  }
-  .child-item .ci-code:hover{border-color:var(--accent)}
-  .leaf-note{margin-top:8px;font-size:13px;color:var(--l2-fg)}
   mark{background:var(--mark);border-radius:3px;padding:0 1px;color:inherit}
 
   .more{display:flex;justify-content:center;margin:16px 0 4px}
@@ -176,11 +169,14 @@
   footer{border-top:1px solid var(--line);background:var(--panel)}
   footer .wrap{padding:18px 16px 30px;color:var(--muted);font-size:14px}
   footer h4{margin:0 0 8px;color:var(--text);font-size:15px}
-  footer .lead{margin:0 0 12px;color:var(--text)}
+  footer .lead{margin:0 0 4px;color:var(--text)}
   footer .lead b{font-weight:600}
-  footer .links{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;margin:0 0 12px}
-  footer .links .cap{color:var(--muted)}
-  footer .links a{white-space:nowrap}
+  .date-line{color:var(--muted);font-size:13px;margin:0 0 12px}
+  .sources{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+  .sources-row{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center}
+  .sources-row .cap{color:var(--muted)}
+  .sources-row a{white-space:nowrap;text-decoration:none;border-bottom:1px solid transparent}
+  .sources-row a:hover{border-bottom-color:var(--accent)}
   footer .disc{margin:0;font-size:13px;color:#7a877d}
 
   /* floating buttons + toast */
@@ -204,31 +200,26 @@
     .row1{flex-direction:column;align-items:stretch}
     .row1>*{width:100%}
     .searchbox{flex:auto}
-    select#section,.lvlgrp{justify-content:space-between}
-    .statusline{flex-direction:column;gap:2px}
-    .statusline .date{text-align:left}
-    .copy-full{margin-left:0}
+    .statusline{flex-direction:column;gap:2px;align-items:flex-start}
+    .reset-link{margin-top:4px}
+    .card-top{flex-direction:column;align-items:stretch}
+    .card-actions{margin-left:0;justify-content:flex-start}
+    .btn-small{justify-content:center}
   }
 </style>
 </head>
 <body>
-<!--
-  Версия каталога после добавления ОКФС — ?v=2.5.0.
-  Порядок публикации:
-    1) сначала обновить prog815/common-menu/menu.js (добавить пункт ОКФС в projectsCatalog) и закоммитить;
-    2) убедиться, что https://prog815.github.io/common-menu/menu.js?v=2.5.0 отдаёт 200;
-    3) затем публиковать этот index.html с ?v=2.5.0 и batch-поднять ?v= во всех справочниках.
-  Пока 2.5.0 не залит в каталог — страница всё равно работает, меню просто не покажет пункт ОКФС.
--->
-<script src="https://prog815.github.io/common-menu/menu.js?v=2.5.0"></script>
+<script src="https://prog815.github.io/common-menu/menu.js?v=3.0.0"></script>
 <common-projects-menu></common-projects-menu>
+
+<script src="https://prog815.github.io/common-menu/share.js?v=1.0.0"></script>
 
 <div class="wrap hero">
   <h1>ОКФС</h1>
   <p>Общероссийский классификатор форм собственности.
      Поиск по <b>коду</b> и <b>наименованию</b>: частная, федеральная, муниципальная, иностранная,
      совместная, собственность общественных и религиозных организаций, государственных корпораций и другие формы.
-     Внутри — список с поиском; карточки разделов раскрывают позиции.</p>
+     Справочник выводит плоский список всех позиций.</p>
 
   <div class="notice">
     <b>ОКФС — это форма собственности</b> («в чьей собственности находится имущество»).
@@ -246,19 +237,16 @@
   <div class="wrap">
     <div class="row1">
       <div class="searchbox" id="searchbox">
-        <input id="q" type="search" autocomplete="off" spellcheck="false"
+        <input id="q" type="text" autocomplete="off" spellcheck="false"
                placeholder="Код (16, 24, 61) или слово: частная, муниципальная, иностранная…"
                aria-label="Поиск по ОКФС">
-        <button class="clear" id="clear" type="button" title="Очистить запрос" aria-label="Очистить запрос">×</button>
-      </div>
-      <div class="lvlgrp" id="lvlgrp" aria-label="Фильтр по типу записи">
-        <span class="cap">Показывать:</span>
+        <button class="clear" id="clear" type="button" title="Очистить запрос" aria-label="Очистить запрос">✕</button>
       </div>
       <select id="section" aria-label="Фильтр по разделу"></select>
     </div>
     <div class="statusline">
       <div class="found" id="found">Загрузка…</div>
-      <div class="date" id="dateLine"></div>
+      <a href="#" id="resetFilters" class="reset-link" title="Очистить все фильтры">Очистить</a>
     </div>
   </div>
 </div>
@@ -277,13 +265,10 @@
   <div class="wrap">
     <h4>О справочнике</h4>
     <p class="lead" id="footLead"></p>
-    <div class="links">
-      <span class="cap">Источник:</span>
-      <a href="https://rosstat.gov.ru/opendata/7708234640-okfs" rel="noopener" target="_blank">Росстат (ОКФС)</a>
-      <a href="https://www.consultant.ru/document/cons_doc_LAW_26587" rel="noopener" target="_blank">КонсультантПлюс</a>
-      <a href="https://internet.garant.ru/#/document/12117985" rel="noopener" target="_blank">Гарант</a>
-      <a href="https://docs.cntd.ru/document/842501030" rel="noopener" target="_blank">Кодекс</a>
-      <a href="https://github.com/prog815/okfs" rel="noopener" target="_blank">О справочнике</a>
+    <div class="date-line" id="dateLine"></div>
+    <div class="sources">
+      <div class="sources-row" id="sourcesPrimary"></div>
+      <div class="sources-row" id="sourcesSecondary"></div>
     </div>
     <p class="disc" id="footDisc"></p>
   </div>
@@ -305,7 +290,7 @@
   var META_JSON= BASE + "okfs_meta.json";
 
   var PAGE_SIZE = 20;
-  var DEBOUNCE_MS = 180;
+  var DEBOUNCE_MS = 200;
   var SCROLL_THRESHOLD = 300;
   var EMPTY_PQ = {rawTerms:[], digits:"", tokens:[], full:""};
 
@@ -313,7 +298,6 @@
   // [code, name, section, parent, level, isLeaf, sourceOrder]
   var F_CODE=0, F_NAME=1, F_SECTION=2, F_PARENT=3, F_LEVEL=4, F_LEAF=5, F_ORDER=6;
 
-  var LEVELS = ["1","2"];
   var LEVEL_STYLE = {
     "1":{c:"var(--l1)", bg:"var(--l1-bg)", fg:"var(--l1-fg)", label:"Раздел"},
     "2":{c:"var(--l2)", bg:"var(--l2-bg)", fg:"var(--l2-fg)", label:"Позиция"}
@@ -327,18 +311,18 @@
   };
 
   var POPULAR = [
-    "частная",
-    "федеральная",
-    "муниципальная",
-    "иностранная",
-    "совместная",
-    "общественные",
-    "религиозные",
-    "благотворительные",
-    "политические партии",
-    "профессиональные союзы",
-    "потребительская кооперация",
-    "государственные корпорации"
+    "частная", "федеральная", "муниципальная", "иностранная", "совместная",
+    "общественных", "религиозных", "благотворительных", "политических партий",
+    "профессиональных союзов", "потребительской кооперации", "государственных корпораций"
+  ];
+
+  var DEFAULT_PRIMARY_SOURCES = [
+    { name: 'Росстат', url: 'https://rosstat.gov.ru/opendata/7708234640-okfs', role: 'primary' }
+  ];
+  var DEFAULT_SECONDARY_SOURCES = [
+    { name: 'КонсультантПлюс', url: 'https://www.consultant.ru/document/cons_doc_LAW_26587', role: 'secondary' },
+    { name: 'Гарант', url: 'https://internet.garant.ru/#/document/12117985', role: 'secondary' },
+    { name: 'Кодекс', url: 'https://docs.cntd.ru/document/842501030', role: 'secondary' }
   ];
 
   // ---------- состояние ----------
@@ -352,6 +336,7 @@
   var filtered = [];
   var shown = PAGE_SIZE;
   var META = null;
+  var activeDeepLinkCode = null;
 
   // ---------- dom ----------
   var $ = function(id){return document.getElementById(id);};
@@ -360,7 +345,8 @@
       elFound=$("found"), elDate=$("dateLine"),
       elChips=$("chips"), elFootLead=$("footLead"), elFootDisc=$("footDisc"), elToast=$("toast"),
       elTop=$("toTop"), elBottom=$("toBottom"),
-      elListView=$("listView"), elLvlGrp=$("lvlgrp");
+      elListView=$("listView"),
+      elSourcesPrimary=$("sourcesPrimary"), elSourcesSecondary=$("sourcesSecondary");
 
   // ---------- утилиты ----------
   function norm(s){
@@ -382,14 +368,17 @@
     if(n10>=2 && n10<=4 && (n100<10||n100>=20)) return forms[1];
     return forms[2];
   }
-  function isLeafRec(r){ return r.isLeaf==="1"; }
-  function isRootRec(r){ return r.level==="1"; }
   function sectionLabel(sec){
     var st = SECTION_STYLE[sec];
     return st ? st.short : ("Раздел "+sec);
   }
   function sectionFull(sec){
     return SECTION_NAME[sec] || (SECTION_STYLE[sec] ? SECTION_STYLE[sec].full : ("Раздел "+sec));
+  }
+  function fmtRuDate(iso){
+    var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso||""));
+    if(!m) return iso||"";
+    return m[3]+"."+m[2]+"."+m[1];
   }
 
   // ---------- загрузка ----------
@@ -430,7 +419,6 @@
 
     META = meta;
     buildIndexes(data);
-    buildLevelFilter();
     buildSectionSelect();
     renderChips();
     renderFooter();
@@ -482,7 +470,6 @@
       }
     }
 
-    // связи родитель -> дети
     for(var j=0;j<RECORDS.length;j++){
       var r = RECORDS[j];
       if(r.parent && BY_CODE[r.parent]){
@@ -499,7 +486,6 @@
       }
     }
 
-    // второй проход: полноценный поисковый индекс и пути
     for(var m=0;m<RECORDS.length;m++){
       var rec = RECORDS[m];
       rec.children = childrenMap[rec.code] || [];
@@ -511,7 +497,6 @@
       rec.blob = norm(rec.code+" "+rec.name+" "+rec.nSectionShort+" "+rec.nSectionFull+" "+parentName);
     }
 
-    // натуральный порядок = sourceOrder, как в исходной выгрузке Росстата
     RECORDS.sort(function(a,b){ return a.sourceOrder - b.sourceOrder; });
   }
 
@@ -524,36 +509,6 @@
   }
 
   // ---------- фильтры ----------
-  function buildLevelFilter(){
-    var frag = document.createDocumentFragment();
-    LEVELS.forEach(function(lv){
-      var st = LEVEL_STYLE[lv];
-      var lab = document.createElement("label");
-      lab.style.setProperty("--lvl", st.c);
-      lab.title = st.label+" ("+(levelCounts[lv]||0)+")";
-      var cb = document.createElement("input");
-      cb.type="checkbox"; cb.value=lv; cb.checked=true; cb.dataset.lvl=lv;
-      var dot = document.createElement("span"); dot.className="dot";
-      var txt = document.createElement("span"); txt.textContent = st.label;
-      lab.appendChild(cb); lab.appendChild(dot); lab.appendChild(txt);
-      cb.addEventListener("change", function(){ applyFilters(); syncUrl(); });
-      frag.appendChild(lab);
-    });
-    elLvlGrp.appendChild(frag);
-  }
-
-  function selectedLevels(){
-    var out=[];
-    var cbs = elLvlGrp.querySelectorAll("input[data-lvl]");
-    for(var i=0;i<cbs.length;i++){ if(cbs[i].checked) out.push(cbs[i].value); }
-    return out;
-  }
-  function setLevels(arr){
-    var set={}; arr.forEach(function(x){set[x]=1;});
-    var cbs = elLvlGrp.querySelectorAll("input[data-lvl]");
-    for(var i=0;i<cbs.length;i++){ cbs[i].checked = !!set[cbs[i].value]; }
-  }
-
   function buildSectionSelect(){
     var nums = EXPECTED_SECTIONS.slice();
     Object.keys(SECTION_COUNT).forEach(function(k){ if(k && nums.indexOf(k)<0) nums.push(k); });
@@ -577,6 +532,8 @@
       b.type="button"; b.className="chip"; b.textContent=p;
       b.title="Искать: "+p;
       b.addEventListener("click",function(){
+        activeDeepLinkCode = null;
+        clearCodeFromUrl();
         elQ.value=p; syncClear(); applyFilters(); syncUrl(); focusTop();
       });
       frag.appendChild(b);
@@ -586,25 +543,65 @@
 
   function renderDateLine(){
     var parts=[];
-    if(META && META.source_date_display) parts.push("Дата актуальности: "+META.source_date_display);
-    if(META && META.valid_until) parts.push("действует до "+fmtRuDate(META.valid_until));
-    if(META && META.provenance) parts.push(META.provenance);
+    if(META){
+      if(META.change_display) parts.push(META.change_display);
+      else if(META.source_date_display) parts.push("Снимок от "+META.source_date_display);
+      
+      if(META.valid_until) parts.push("действует до "+fmtRuDate(META.valid_until));
+    } else {
+      parts.push("Дата актуальности не определена");
+    }
     elDate.textContent = parts.join(" · ");
   }
-  function fmtRuDate(iso){
-    var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso||""));
-    if(!m) return iso||"";
-    return m[3]+"."+m[2]+"."+m[1];
+
+  function mergeSources(metaSources, defaults) {
+    var byUrl = new Map(defaults.map(function(s){ return [s.url, s]; }));
+    if (Array.isArray(metaSources)) {
+      for (var s of metaSources) {
+        if (s && s.url && !byUrl.has(s.url)) {
+          byUrl.set(s.url, s);
+        }
+      }
+    }
+    return Array.from(byUrl.values());
+  }
+
+  function linkFor(s) {
+    var a = document.createElement('a');
+    a.href = s.url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.textContent = s.name;
+    a.title = s.name;
+    return a;
   }
 
   function renderFooter(){
     var total = RECORDS.length;
     var s = "В справочнике "+fmtNum(total)+" "+plural(total,["запись","записи","записей"])+
             " ("+fmtNum(levelCounts["1"]||0)+" "+plural(levelCounts["1"]||0,["раздел","раздела","разделов"])+
-            ", "+fmtNum(levelCounts["2"]||0)+" "+plural(levelCounts["2"]||0,["позиция","позиции","позиций"])+")."+
-            " Разделов: "+fmtNum(Object.keys(SECTION_ROOT).length)+
-            ", позиций: "+fmtNum(leafCount)+".";
+            ", "+fmtNum(levelCounts["2"]||0)+" "+plural(levelCounts["2"]||0,["позиция","позиции","позиций"])+").";
     elFootLead.innerHTML = escHtml(s).replace(/(\d[\d\u00a0.]*)/g,"<b>$1</b>");
+
+    var primaryList = META && META.primary_sources ? META.primary_sources.filter(function(x){return x.role==='primary'}) : [];
+    var secondaryList = META && META.primary_sources ? META.primary_sources.filter(function(x){return x.role==='secondary'}) : [];
+    
+    var mergedPrimary = mergeSources(primaryList, DEFAULT_PRIMARY_SOURCES);
+    var mergedSecondary = mergeSources(secondaryList, DEFAULT_SECONDARY_SOURCES);
+
+    elSourcesPrimary.innerHTML = '<span class="cap">Источник данных (машиночитаемый снимок):</span>';
+    mergedPrimary.forEach(function(src){ elSourcesPrimary.appendChild(linkFor(src)); });
+
+    elSourcesSecondary.innerHTML = '<span class="cap">Первоисточники и текстовые редакции для сверки:</span>';
+    mergedSecondary.forEach(function(src){ elSourcesSecondary.appendChild(linkFor(src)); });
+    
+    var aboutLink = document.createElement('a');
+    aboutLink.href = 'https://github.com/prog815/okfs';
+    aboutLink.target = '_blank';
+    aboutLink.rel = 'noopener noreferrer';
+    aboutLink.textContent = 'О справочнике';
+    aboutLink.title = 'О справочнике (репозиторий проекта)';
+    elSourcesSecondary.appendChild(aboutLink);
 
     var d = "Справочник носит информационный характер. Для официального применения сверяйтесь с действующей редакцией Общероссийского классификатора форм собственности и открытыми данными Росстата. "+
             "ОКФС не идентифицирует конкретную организацию или объект недвижимости и не заменяет выписки из реестров. "+
@@ -653,45 +650,44 @@
 
   function applyFilters(){
     var sect = elSection.value || "";
-    var lvls = {}; selectedLevels().forEach(function(l){lvls[l]=1;});
-    var allLevels = LEVELS.every(function(l){return lvls[l];});
     var pq = prepareQuery(elQ.value);
     var hasQuery = !!(pq.digits || pq.tokens.length);
 
-    var base = [];
-    for(var i=0;i<RECORDS.length;i++){
-      var r = RECORDS[i];
-      if(sect && r.section !== sect) continue;
-      if(!lvls[r.level]) continue;
-      base.push(r);
-    }
-
-    if(hasQuery){
-      var scored=[];
-      for(var a=0;a<base.length;a++){
-        var s = scoreRecord(base[a], pq);
-        if(s!==null) scored.push({r:base[a], s:s});
+    if (activeDeepLinkCode) {
+      var match = BY_CODE[activeDeepLinkCode];
+      filtered = match ? [match] : [];
+    } else {
+      var base = [];
+      for(var i=0;i<RECORDS.length;i++){
+        var r = RECORDS[i];
+        if(sect && r.section !== sect) continue;
+        base.push(r);
       }
-      scored.sort(function(x,y){
-        if(y.s!==x.s) return y.s-x.s;
-        var lx=parseInt(x.r.level,10)||99, ly=parseInt(y.r.level,10)||99;
-        if(lx!==ly) return lx-ly;
-        return x.r.sourceOrder - y.r.sourceOrder;
-      });
-      filtered = scored.map(function(o){return o.r;});
-    }else{
-      filtered = base;
+
+      if(hasQuery){
+        var scored=[];
+        for(var a=0;a<base.length;a++){
+          var s = scoreRecord(base[a], pq);
+          if(s!==null) scored.push({r:base[a], s:s});
+        }
+        scored.sort(function(x,y){
+          if(y.s!==x.s) return y.s-x.s;
+          return x.r.sourceOrder - y.r.sourceOrder;
+        });
+        filtered = scored.map(function(o){return o.r;});
+      }else{
+        filtered = base;
+      }
     }
 
     filtered._pq = pq;
     filtered._hasQuery = hasQuery;
-    filtered._allLevels = allLevels;
 
     shown = PAGE_SIZE;
     renderList();
   }
 
-  // ---------- рендер списка ----------
+  // ---------- рендер списка (плоский) ----------
   function renderList(){
     var pq = filtered._pq || EMPTY_PQ;
     var terms = pq.rawTerms || [];
@@ -707,42 +703,14 @@
       return;
     }
 
-    var grouped = !filtered._hasQuery && filtered._allLevels;
-    var roots = grouped ? filtered.filter(isRootRec) : [];
-
-    // Если по какой-то причине нет корней, откатываемся в плоский режим.
-    if(grouped && roots.length){
-      var positionsCount = 0;
-      roots.forEach(function(r){
-        positionsCount += (r.children || []).filter(function(ccode){
-          var cr = BY_CODE[ccode];
-          return cr && cr.level === "2";
-        }).length;
-      });
-
-      elFound.innerHTML =
-        "Найдено: <b>"+total+"</b> · Показано: <b>"+roots.length+"</b> "+
-        plural(roots.length,["раздел","раздела","разделов"])+
-        " (внутри — <b>"+positionsCount+"</b> "+plural(positionsCount,["позиция","позиции","позиций"])+")";
-
-      elState.hidden=true; elList.hidden=false;
-      var frag = document.createDocumentFragment();
-      for(var i=0;i<roots.length;i++){
-        frag.appendChild(buildCard(roots[i], [], "", {groupedRoot:true}));
-      }
-      elList.innerHTML=""; elList.appendChild(frag);
-      elMore.textContent=""; elMoreWrap.hidden=true;
-      return;
-    }
-
     var visible = Math.min(shown, total);
     elFound.innerHTML = "Найдено: <b>"+total+"</b> · Показано: <b>"+visible+"</b>";
 
     elState.hidden=true; elList.hidden=false;
-    var frag2 = document.createDocumentFragment();
+    var frag = document.createDocumentFragment();
     var slice = filtered.slice(0, shown);
-    for(var j=0;j<slice.length;j++) frag2.appendChild(buildCard(slice[j], terms, digits, {}));
-    elList.innerHTML=""; elList.appendChild(frag2);
+    for(var j=0;j<slice.length;j++) frag.appendChild(buildCard(slice[j], terms, digits));
+    elList.innerHTML=""; elList.appendChild(frag);
 
     if(visible < total){
       var next = Math.min(shown+PAGE_SIZE, total);
@@ -753,6 +721,33 @@
       elMore.textContent="";
       elMoreWrap.hidden=true;
     }
+
+    bindShareButtons();
+  }
+
+  // ---------- share ----------
+  function bindShareButtons() {
+    var slots = elList.querySelectorAll('.share-slot');
+    slots.forEach(function(slot) {
+      var code = slot.dataset.code || '';
+      var name = slot.dataset.name || '';
+      var rowText = slot.dataset.row || '';
+      
+      var wrap = document.createElement('klassik-share');
+      wrap.setAttribute('catalog', 'okfs');
+      wrap.setAttribute('title', 'ОКФС: ' + code + ' — ' + name);
+      wrap.setAttribute('text', rowText);
+      wrap.setAttribute('url', location.origin + location.pathname + '?code=' + encodeURIComponent(code));
+      
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn-small';
+      btn.title = 'Поделиться карточкой';
+      btn.innerHTML = '📤 Поделиться';
+      wrap.appendChild(btn);
+      
+      slot.parentNode.replaceChild(wrap, slot);
+    });
   }
 
   // ---------- подсветка ----------
@@ -774,8 +769,7 @@
   }
 
   // ---------- карточка ----------
-  function buildCard(r, terms, digits, opts){
-    opts = opts || {};
+  function buildCard(r, terms, digits){
     var li = document.createElement("li");
     var card = document.createElement("article");
     card.className="card";
@@ -800,11 +794,9 @@
     codeBtn.dataset.act="copy-code"; codeBtn.dataset.val=r.code;
     top.appendChild(codeBtn);
 
-    var lvlBadge = document.createElement("button");
-    lvlBadge.type="button"; lvlBadge.className="badge badge-level";
+    var lvlBadge = document.createElement("span");
+    lvlBadge.className="badge badge-level";
     lvlBadge.textContent = lvlSt.label || ("Ур."+r.level);
-    lvlBadge.title = "Фильтровать: только "+(lvlSt.label||("уровень "+r.level));
-    lvlBadge.dataset.act="filter-level"; lvlBadge.dataset.val=r.level;
     top.appendChild(lvlBadge);
 
     var secBadge = document.createElement("button");
@@ -814,21 +806,31 @@
     secBadge.dataset.act="filter-section"; secBadge.dataset.val=r.section;
     top.appendChild(secBadge);
 
-    var copyFull = document.createElement("button");
-    copyFull.type="button"; copyFull.className="copy-full";
+    // Actions
+    var actions = document.createElement("div"); actions.className = "card-actions";
+    
+    var rowBtn = document.createElement("button");
+    rowBtn.type="button"; rowBtn.className="btn-small";
     var fullVal = r.code+"; "+r.name;
-    copyFull.textContent = "📋 код + название";
-    copyFull.title = "Скопировать: "+fullVal;
-    copyFull.dataset.act="copy-full"; copyFull.dataset.val=fullVal;
-    top.appendChild(copyFull);
+    rowBtn.innerHTML = "📋 строка";
+    rowBtn.title = "Скопировать: "+fullVal;
+    rowBtn.dataset.act="copy-full"; rowBtn.dataset.val=fullVal;
+    actions.appendChild(rowBtn);
 
+    var shareSlot = document.createElement("span");
+    shareSlot.className = "share-slot";
+    shareSlot.dataset.code = r.code;
+    shareSlot.dataset.name = r.name;
+    shareSlot.dataset.row = fullVal;
+    actions.appendChild(shareSlot);
+
+    top.appendChild(actions);
     card.appendChild(top);
 
     var name = document.createElement("div"); name.className="name";
     name.innerHTML = hlText(r.name, terms);
     card.appendChild(name);
 
-    // раздел / корень
     if(r.parent && BY_CODE[r.parent]){
       var pr = BY_CODE[r.parent];
       var rr = document.createElement("div"); rr.className="rel-row";
@@ -840,62 +842,6 @@
       var pn = document.createElement("span"); pn.textContent=" "+pr.name;
       rr.appendChild(rl); rr.appendChild(pc); rr.appendChild(pn);
       card.appendChild(rr);
-    }else{
-      var rr2 = document.createElement("div"); rr2.className="rel-row";
-      rr2.innerHTML = '<span class="rel-lbl">Корневой раздел ОКФС</span>';
-      card.appendChild(rr2);
-    }
-
-    // путь
-    if(r.path && r.path.length>1){
-      var pathRow = document.createElement("div"); pathRow.className="path";
-      for(var i=0;i<r.path.length;i++){
-        var ccode = r.path[i];
-        var crec = BY_CODE[ccode];
-        if(!crec) continue;
-        var isCur = (i===r.path.length-1);
-        var b = document.createElement("button");
-        b.type="button"; b.className="path-item"+(isCur?" cur":"");
-        b.textContent = crec.code;
-        b.title = crec.code+" "+crec.name;
-        if(!isCur){ b.dataset.act="open-code"; b.dataset.val=crec.code; }
-        pathRow.appendChild(b);
-        if(i<r.path.length-1){
-          var sep=document.createElement("span"); sep.className="path-sep"; sep.textContent="→";
-          pathRow.appendChild(sep);
-        }
-      }
-      card.appendChild(pathRow);
-    }
-
-    // позиции внутри раздела — только в групповом режиме без поиска
-    if(opts.groupedRoot && r.children && r.children.length){
-      var det = document.createElement("details"); det.className="child-details";
-      det.open = true;
-      var sum = document.createElement("summary");
-      sum.textContent = "Позиции раздела ("+r.children.length+")";
-      det.appendChild(sum);
-
-      var ul = document.createElement("ul");
-      r.children.forEach(function(ccode){
-        var crec = BY_CODE[ccode]; if(!crec || crec.level!=="2") return;
-        var li2 = document.createElement("li"); li2.className="child-item";
-        var cb = document.createElement("button"); cb.type="button"; cb.className="ci-code";
-        cb.textContent = crec.code; cb.title="Открыть: "+crec.code+" "+crec.name;
-        cb.dataset.act="open-code"; cb.dataset.val=crec.code;
-        var cn = document.createElement("span"); cn.innerHTML = hlText(crec.name, terms);
-        li2.appendChild(cb); li2.appendChild(cn);
-        ul.appendChild(li2);
-      });
-      det.appendChild(ul);
-      card.appendChild(det);
-    }
-
-    // примечание для позиции в плоском режиме
-    if(r.level==="2" && !opts.groupedRoot){
-      var ln = document.createElement("div"); ln.className="leaf-note";
-      ln.textContent = "✓ Позиция раздела";
-      card.appendChild(ln);
     }
 
     li.appendChild(card);
@@ -905,23 +851,26 @@
   // ---------- навигация ----------
   function openCode(code){
     var rec = BY_CODE[code];
+    if(!rec) return;
 
-    // Если открываем раздел — показываем его раздел с позициями, без поискового запроса.
-    if(rec && rec.level==="1"){
+    if(rec.level==="1"){
+      // При клике на раздел фильтруем по нему
       elQ.value=""; syncClear();
       elSection.value=rec.section;
-      setLevels(LEVELS);
+      activeDeepLinkCode = null;
+      clearCodeFromUrl();
       applyFilters();
       syncUrl();
-      focusCode(code);
+      focusTop();
       return;
     }
 
-    // Если открываем позицию — точный поиск по коду.
+    // Если позиция — ставим exact code в поиск
     elQ.value=code; syncClear();
-    setLevels(LEVELS);
+    elSection.value="";
+    activeDeepLinkCode = code;
+    syncCodeToUrl(code);
     applyFilters();
-    syncUrl();
     focusCode(code);
   }
 
@@ -939,25 +888,46 @@
   // ---------- URL ----------
   function parseUrlAndApply(){
     var sp = new URLSearchParams(location.search);
+    var code = sp.get("code");
+    
+    if(code){
+      activeDeepLinkCode = code;
+      elQ.value = code;
+      elSection.value = "";
+      syncClear();
+      applyFilters();
+      focusCode(code);
+      return;
+    }
+
+    activeDeepLinkCode = null;
     var q = sp.get("q")||"";
-    var lvl = sp.get("lvl");
     var sect = sp.get("section")||"";
 
     elQ.value = q; syncClear();
-    if(lvl!=null && lvl!==""){ setLevels(lvl.split(",").filter(Boolean)); }
-    else { setLevels(LEVELS); }
     elSection.value = sect && (EXPECTED_SECTIONS.indexOf(sect)>=0 || SECTION_COUNT[sect]!=null) ? sect : "";
     applyFilters();
   }
+
   function syncUrl(){
+    if(activeDeepLinkCode) return;
+
     var sp = new URLSearchParams();
     var q = elQ.value.trim(); if(q) sp.set("q", q);
-    var sel = selectedLevels();
-    if(sel.length!==LEVELS.length) sp.set("lvl", sel.join(","));
     if(elSection.value) sp.set("section", elSection.value);
     var qs = sp.toString();
     var url = location.pathname + (qs?("?"+qs):"");
     try{ history.replaceState(null,"",url); }catch(e){}
+  }
+
+  function syncCodeToUrl(code) {
+    history.replaceState(null, '', location.pathname + '?code=' + encodeURIComponent(code));
+  }
+
+  function clearCodeFromUrl() {
+    if (location.search.includes('code=')) {
+      history.replaceState(null, '', location.pathname + location.hash);
+    }
   }
 
   // ---------- копирование + тост ----------
@@ -966,7 +936,7 @@
     elToast.textContent = msg;
     elToast.classList.add("show");
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(function(){ elToast.classList.remove("show"); }, 1600);
+    toastTimer = setTimeout(function(){ elToast.classList.remove("show"); }, 1800);
   }
   function copyText(text, label){
     var done=function(){ toast(label); };
@@ -986,13 +956,16 @@
     var btn = e.target.closest("[data-act]");
     if(!btn) return;
     var act = btn.dataset.act, val = btn.dataset.val;
-    if(act==="copy-code") copyText(val, "Код "+val+" скопирован");
+    if(act==="copy-code") {
+      copyText(val, "Код "+val+" скопирован");
+      syncCodeToUrl(val);
+    }
     else if(act==="copy-full") copyText(val, "Скопировано: "+val);
     else if(act==="open-code"){ e.stopPropagation(); openCode(val); }
-    else if(act==="filter-section"){ elSection.value=val; setLevels(LEVELS); applyFilters(); syncUrl(); focusTop(); }
-    else if(act==="filter-level"){
-      setLevels([val]);
-      applyFilters(); syncUrl(); focusTop();
+    else if(act==="filter-section"){ 
+      activeDeepLinkCode = null;
+      clearCodeFromUrl();
+      elSection.value=val; applyFilters(); syncUrl(); focusTop(); 
     }
   }
 
@@ -1002,15 +975,42 @@
 
   var deb=null;
   function onInput(){
+    activeDeepLinkCode = null;
+    clearCodeFromUrl();
     syncClear();
     clearTimeout(deb);
     deb=setTimeout(function(){ applyFilters(); syncUrl(); }, DEBOUNCE_MS);
   }
 
   elQ.addEventListener("input", onInput);
-  elQ.addEventListener("search", function(){ syncClear(); applyFilters(); syncUrl(); });
-  elClear.addEventListener("click", function(){ elQ.value=""; syncClear(); applyFilters(); syncUrl(); elQ.focus(); });
-  elSection.addEventListener("change", function(){ applyFilters(); syncUrl(); });
+  elQ.addEventListener("search", function(){ 
+    activeDeepLinkCode = null;
+    clearCodeFromUrl();
+    syncClear(); applyFilters(); syncUrl(); 
+  });
+  elClear.addEventListener("click", function(){ 
+    activeDeepLinkCode = null;
+    clearCodeFromUrl();
+    elQ.value=""; syncClear(); applyFilters(); syncUrl(); elQ.focus(); 
+  });
+  elSection.addEventListener("change", function(){ 
+    activeDeepLinkCode = null;
+    clearCodeFromUrl();
+    applyFilters(); syncUrl(); 
+  });
+  
+  $("resetFilters").addEventListener("click", function(e){
+    e.preventDefault();
+    activeDeepLinkCode = null;
+    clearCodeFromUrl();
+    elQ.value="";
+    elSection.value="";
+    syncClear();
+    applyFilters();
+    syncUrl();
+    elQ.focus();
+  });
+
   elMore.addEventListener("click", function(){ shown += PAGE_SIZE; renderList(); });
   elList.addEventListener("click", onListClick);
 
