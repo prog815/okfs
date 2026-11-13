@@ -1,9 +1,9 @@
-name: Daily OKFS Update
+name: Weekly OKFS Update
 
 on:
   schedule:
-    - cron: '0 17 * * *'      # 17:00 UTC = 20:00 МСК
-  workflow_dispatch:
+    - cron: '17 6 * * 3'      # 06:17 UTC = 09:17 МСК, среда (слот ОКФС из §3.2)
+  workflow_dispatch:          # ручной запуск
 
 jobs:
   sync-and-trigger:
@@ -11,10 +11,10 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: write
-
     env:
       # Kaggle CLI >= 1.8.0 читает KAGGLE_API_TOKEN напрямую.
       # В репозитории секрет называется KAGGLE_API_TOKEN_OKFS, внутри — чистый токен.
+      # В Kaggle токен называется gha-okfs.
       KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN_OKFS }}
 
     steps:
@@ -48,26 +48,26 @@ jobs:
             [ -f "$f" ] && { echo ">>> $f (last 50 lines) >>>"; tail -n 50 "$f"; echo "<<< $f <<<"; echo ""; }
           done || true
 
-      - name: Detect SRC and copy web files
+      - name: Detect SRC and copy web files (.gz only)
         id: copy
         run: |
-          # Авто-детект (стандарт §11 v-next): okfs_data/web → web.
-          # Голый ./output запрещён.
+          # Авто-детект по §3.1: okfs_data/web (стандарт) → web (фоллбэк).
+          # Публикуются ТОЛЬКО .gz (fallback .json убран, §2.10).
           SRC=""
           for cand in "./output/okfs_data/web" "./output/web"; do
-            if [ -f "$cand/okfs.json" ]; then
+            if [ -f "$cand/okfs.json.gz" ]; then
               SRC="$cand"
               break
             fi
           done
           if [ -z "$SRC" ]; then
-            echo "::warning::okfs.json не найден ни в ./output/okfs_data/web, ни в ./output/web"
+            echo "::warning::okfs.json.gz не найден ни в ./output/okfs_data/web, ни в ./output/web"
             echo "FILES_OK=false" >> "$GITHUB_ENV"
             exit 0
           fi
           echo "SRC=$SRC"
           MISSING=0
-          for f in okfs.json okfs.json.gz okfs_meta.json okfs_meta.json.gz; do
+          for f in okfs.json.gz okfs_meta.json.gz; do
             if [ -f "$SRC/$f" ]; then
               cp "$SRC/$f" "./$f"
               echo "copied $f"
@@ -77,21 +77,21 @@ jobs:
             fi
           done
           if [ "$MISSING" -gt 0 ]; then
-            echo "❌ Отсутствует $MISSING из 4 файлов — коммит пропущен"
+            echo "❌ Отсутствует $MISSING из 2 .gz файлов — коммит пропущен, сайт остаётся на последней хорошей версии"
             echo "FILES_OK=false" >> "$GITHUB_ENV"
           else
-            echo "✅ Все 4 файла на месте"
+            echo "✅ Оба .gz файла на месте"
             echo "FILES_OK=true" >> "$GITHUB_ENV"
           fi
 
-      - name: Check metadata
+      - name: Check metadata (META_OK)
         id: meta
         if: env.FILES_OK == 'true'
         run: |
           python - <<'EOF'
-          import json, hashlib, os, re
+          import gzip, hashlib, json, os, re
 
-          with open("okfs_meta.json", "r", encoding="utf-8") as f:
+          with gzip.open("okfs_meta.json.gz", "rt", encoding="utf-8") as f:
               m = json.load(f)
 
           ok = True
@@ -108,30 +108,47 @@ jobs:
               ok = False
               reasons.append(f"critical_errors={ce}")
 
-          # 3. data_hash_full ↔ фактический sha256 okfs.json
-          with open("okfs.json", "rb") as f:
-              actual_full = hashlib.sha256(f.read()).hexdigest()
-          declared_full = m.get("data_hash_full")
+          # 3. records_count > 0
+          rc = m.get("records_count")
+          if not isinstance(rc, int) or rc <= 0:
+              ok = False
+              reasons.append(f"records_count={rc}")
+
+          # 4. data_hash_full — 64 hex-символа
+          declared_full = m.get("data_hash_full") or ""
+          declared_short = m.get("data_hash") or ""
           if not declared_full:
-              reasons.append("data_hash_full отсутствует в мете (warning, не блокирует)")
+              ok = False
+              reasons.append("data_hash_full отсутствует в мете")
           elif not re.fullmatch(r"[0-9a-f]{64}", str(declared_full)):
               ok = False
               reasons.append(f"data_hash_full невалидный: {declared_full}")
-          elif declared_full != actual_full:
+
+          # 5. data_hash == data_hash_full[:16] (§3.1) — блокирует
+          if declared_short and declared_full and declared_short != declared_full[:16]:
               ok = False
               reasons.append(
-                  f"data_hash_full mismatch: meta={declared_full[:16]}… actual={actual_full[:16]}…")
+                  f"data_hash != data_hash_full[:16]: short={declared_short} full_prefix={declared_full[:16]}"
+              )
 
-          # 4. data_hash (16) ↔ префикс sha256
-          declared_short = m.get("data_hash")
-          if declared_short and declared_short != actual_full[:16]:
-              ok = False
-              reasons.append(f"data_hash mismatch: meta={declared_short} actual={actual_full[:16]}")
+          # 6. Информационная сверка sha256(okfs.json) с data_hash_full — НЕ блокирует.
+          #    Семантика data_hash_full в ОКФС пока не подтверждена как sha256-от-байтов
+          #    (в OKZ это подтвердили отдельно и подняли до блокирующей; в ОКЕИ не поднимали).
+          #    Пока — только лог. Если подтвердится — снять комментарий и добавить ok = False.
+          if declared_full:
+              try:
+                  with gzip.open("okfs.json.gz", "rb") as f:
+                      content = f.read()
+                  actual_full = hashlib.sha256(content).hexdigest()
+                  if declared_full == actual_full:
+                      print(f"✓ sha256(okfs.json) == data_hash_full ({actual_full[:16]}…)")
+                  else:
+                      print(f"  ⚠ sha256(okfs.json)={actual_full[:16]}… != data_hash_full={declared_full[:16]}… (информационно, не блокирует)")
+              except Exception as e:
+                  print(f"  ⚠ не удалось сверить sha256(okfs.json): {e}")
 
           if ok:
-              print("✓ Мета OK: publish_allowed=true, critical_errors=[], data_hash_full совпадает")
-              for r in reasons:
-                  print(f"  ⚠ {r}")
+              print("✓ META_OK: publish_allowed=true, critical_errors=[], records_count>0, data_hash == data_hash_full[:16]")
               with open(os.environ["GITHUB_ENV"], "a") as env:
                   env.write("META_OK=true\n")
           else:
@@ -147,17 +164,19 @@ jobs:
         run: |
           git config --local user.email "github-actions@github.com"
           git config --local user.name "GitHub Actions"
-          git add okfs.json okfs.json.gz okfs_meta.json okfs_meta.json.gz
+          git add okfs.json.gz okfs_meta.json.gz
           if git diff --cached --quiet; then
             echo "✅ Изменений нет — данные уже актуальны"
           else
-            SOURCE_DATE=$(python -c 'import json;m=json.load(open("okfs_meta.json"));print(m.get("source_date") or m.get("effective_date") or m.get("prepared_date") or m.get("generated_at") or "?")')
-            git commit -m "Auto-update: OKFS data from kernel output (source $SOURCE_DATE) [skip ci]"
+            # SOURCE_DATE через gzip -d -c | python -c (как в RES_VCHU; без heredoc).
+            # Цепочка: source_date → effective_date → prepared_date → generated_at → '?'.
+            SOURCE_DATE=$(gzip -d -c okfs_meta.json.gz | python -c "import sys, json; m=json.load(sys.stdin); print(m.get('source_date') or m.get('effective_date') or m.get('prepared_date') or m.get('generated_at') or '?')")
+            git commit -m "Auto-update: okfs data (source ${SOURCE_DATE}) [skip ci]"
             git push
-            echo "✅ Изменения запушены (source=$SOURCE_DATE)"
+            echo "✅ Изменения запушены (source=${SOURCE_DATE})"
           fi
 
-      - name: Trigger new notebook run (fire-and-forget, всегда)
+      - name: Trigger new notebook run (fire-and-forget, always)
         if: always()
         run: |
           mkdir -p ./nb
