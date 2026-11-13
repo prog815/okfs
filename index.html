@@ -195,6 +195,13 @@
   }
   .code-btn:hover { background:#dbeafe; border-color:var(--brand); }
 
+  /* Бейджи (раздел) */
+  .badges { display:flex; flex-wrap:wrap; gap:6px; justify-content:flex-end; align-items:center; }
+  .badge { display:inline-flex; align-items:center; padding:4px 8px; border-radius:999px; font-size:0.75rem; font-weight:600; border:1px solid transparent; white-space:nowrap; }
+  .badge.root { background:#f0fff4; color:#22543d; border-color:#c6f6d5; cursor:pointer; transition: filter .15s; }
+  .badge.root:hover { filter:brightness(0.95); }
+  @media(prefers-color-scheme:dark){ .badge.root { background:rgba(47,133,90,.2); color:#9ae6b4; border-color:rgba(47,133,90,.4); } }
+
   .name{
     font-size:18px; font-weight:600; line-height:1.4; margin-bottom:12px; color:var(--ink);
   }
@@ -265,6 +272,7 @@
     .name{font-size:16px}
     .searchbar input[type=text], .searchbar select { width: 100%; flex: 1 1 100%; }
     .row1 { flex-direction: column; }
+    .badges { justify-content: flex-start; margin-top: 8px; }
   }
 </style>
 </head>
@@ -724,11 +732,18 @@
     var isHighlight = (r.c === activeDeepLinkCode);
     var titleHtml = highlight(r.n, queryTokens);
 
+    var badgesHtml = '';
+    if (r.section) {
+      var sec = DEFAULT_SECTIONS[r.section] || { short: 'Раздел ' + r.section, full: 'Раздел ' + r.section };
+      badgesHtml += '<span class="badge root clickable" data-root="' + r.section + '" title="Показать только раздел: ' + esc(sec.full) + '">§' + r.section + ' ' + esc(sec.short) + '</span>';
+    }
+
     return '<article class="card lvl-' + (r.level || '1') + (isHighlight ? ' highlight' : '') + '" data-code="' + esc(r.c) + '" title="Карточка: ' + esc(r.n) + '">' +
       '<div class="row1">' +
         '<div style="display:flex;gap:6px;align-items:center;">' +
           '<button type="button" class="code-btn" data-copy="' + r.c + '" data-code="' + r.c + '" title="Скопировать код">' + highlight(r.c, queryTokens) + '</button>' +
         '</div>' +
+        '<div class="badges">' + badgesHtml + '</div>' +
       '</div>' +
       '<div class="name">' + titleHtml + '</div>' +
       '<div class="actions">' +
@@ -841,6 +856,19 @@
 
   els.results.addEventListener('click', function(ev){
     var target = ev.target;
+
+    var badgeRoot = target.closest('.badge.root');
+    if (badgeRoot) {
+      els.root.value = badgeRoot.getAttribute('data-root');
+      activeDeepLinkCode = null;
+      var url = new URL(window.location);
+      url.searchParams.delete('code');
+      url.searchParams.set('section', els.root.value);
+      history.replaceState(null, '', url.toString());
+      runSearch();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
 
     var codeBtn = target.closest('.code-btn');
     if (codeBtn) {
