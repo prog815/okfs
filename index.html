@@ -195,14 +195,6 @@
   }
   .code-btn:hover { background:#dbeafe; border-color:var(--brand); }
 
-  .badges { display:flex; flex-wrap:wrap; gap:6px; justify-content:flex-end; align-items:center; }
-  .badge { display:inline-flex; align-items:center; padding:4px 8px; border-radius:999px; font-size:0.75rem; font-weight:600; border:1px solid transparent; white-space:nowrap; }
-  
-  .badge.lvl { background:var(--accent); color:var(--brand-d); }
-  .badge.root { background:#f0fff4; color:#22543d; border-color:#c6f6d5; cursor:pointer; transition: filter .15s; }
-  .badge.root:hover { filter:brightness(0.95); }
-  @media(prefers-color-scheme:dark){ .badge.root { background:rgba(47,133,90,.2); color:#9ae6b4; border-color:rgba(47,133,90,.4); } }
-
   .name{
     font-size:18px; font-weight:600; line-height:1.4; margin-bottom:12px; color:var(--ink);
   }
@@ -273,7 +265,6 @@
     .name{font-size:16px}
     .searchbar input[type=text], .searchbar select { width: 100%; flex: 1 1 100%; }
     .row1 { flex-direction: column; }
-    .badges { justify-content: flex-start; margin-top: 8px; }
   }
 </style>
 </head>
@@ -377,11 +368,6 @@
   var view = { list: [], shown: 0 };
   var loadingInterval = null;
 
-  var LEVEL_NAMES = {
-    "1": "Раздел",
-    "2": "Позиция"
-  };
-
   var DEFAULT_SECTIONS = {
     "1": { short: "Российская", full: "Российская собственность" },
     "2": { short: "Иностранная", full: "Иностранная собственность" },
@@ -447,23 +433,6 @@
   function normName(s){ return String(s == null ? '' : s).toLowerCase().replace(/ё/g, 'е').replace(/\s+/g, ' ').trim(); }
   function fmt(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0'); }
 
-  function getSectionInfo(sec){
-    if (!sec) return null;
-    if (META && Array.isArray(META.sections)){
-      var found = META.sections.find(function(s){ return (s.section || s.root) === sec; });
-      if (found) return { short: found.short || found.name, full: found.name };
-    }
-    return DEFAULT_SECTIONS[sec] || null;
-  }
-  function sectionShort(sec){
-    var info = getSectionInfo(sec);
-    return info ? info.short : ('§' + sec);
-  }
-  function sectionFull(sec){
-    var info = getSectionInfo(sec);
-    return info ? info.full : ('Раздел ' + sec);
-  }
-
   function highlight(text, tokens) {
     if (!tokens || !tokens.length || !text) return esc(text);
     var html = esc(text);
@@ -506,9 +475,15 @@
     var list = [];
     if (META && Array.isArray(META.sections) && META.sections.length) {
       list = META.sections.map(function(s){
+        // Нормализация: если пришел root: "10", приводим к section: "1"
+        var val = String(s.section || s.root || '');
+        if (val.length > 1 && /^\d+$/.test(val)) {
+          val = val.charAt(0);
+        }
+        var def = DEFAULT_SECTIONS[val] || { short: 'Раздел ' + val, full: 'Раздел ' + val };
         return {
-          section: String(s.section || s.root || ''),
-          name: s.name || '',
+          section: val,
+          name: s.name || def.full,
           count: typeof s.count === 'number' ? s.count : null
         };
       });
@@ -554,7 +529,7 @@
         var order = parseInt(it[6], 10);
         if (!isFinite(order)) order = idx + 1;
 
-        var blob = normName(c + ' ' + n + ' ' + sectionShort(section) + ' ' + sectionFull(section));
+        var blob = normName(c + ' ' + n + ' ' + (DEFAULT_SECTIONS[section] ? DEFAULT_SECTIONS[section].short : section));
 
         return {
           c: c,
@@ -701,10 +676,8 @@
   function getShareText(r, url) {
     var lines = [r.c + ' — ' + r.n];
     if (r.section) {
-      lines.push('Раздел: ' + r.section + ' (' + sectionFull(r.section) + ')');
-    }
-    if (r.level) {
-      lines.push('Уровень: ' + r.level + ' (' + (LEVEL_NAMES[r.level] || 'Группа') + ')');
+      var secFull = DEFAULT_SECTIONS[r.section] ? DEFAULT_SECTIONS[r.section].full : 'Раздел ' + r.section;
+      lines.push('Раздел: ' + r.section + ' (' + secFull + ')');
     }
     lines.push('Ссылка: ' + url);
     return lines.join('\n');
@@ -751,20 +724,11 @@
     var isHighlight = (r.c === activeDeepLinkCode);
     var titleHtml = highlight(r.n, queryTokens);
 
-    var badgesHtml = '';
-    if (r.level) {
-      badgesHtml += '<span class="badge lvl">' + r.level + ' · ' + (LEVEL_NAMES[r.level] || 'Группа') + '</span>';
-    }
-    if (r.section) {
-      badgesHtml += '<span class="badge root clickable" data-root="' + r.section + '" title="Показать только раздел: ' + esc(sectionFull(r.section)) + '">§' + r.section + ' ' + esc(sectionShort(r.section)) + '</span>';
-    }
-
     return '<article class="card lvl-' + (r.level || '1') + (isHighlight ? ' highlight' : '') + '" data-code="' + esc(r.c) + '" title="Карточка: ' + esc(r.n) + '">' +
       '<div class="row1">' +
         '<div style="display:flex;gap:6px;align-items:center;">' +
           '<button type="button" class="code-btn" data-copy="' + r.c + '" data-code="' + r.c + '" title="Скопировать код">' + highlight(r.c, queryTokens) + '</button>' +
         '</div>' +
-        '<div class="badges">' + badgesHtml + '</div>' +
       '</div>' +
       '<div class="name">' + titleHtml + '</div>' +
       '<div class="actions">' +
@@ -877,19 +841,6 @@
 
   els.results.addEventListener('click', function(ev){
     var target = ev.target;
-
-    var badgeRoot = target.closest('.badge.root');
-    if (badgeRoot) {
-      els.root.value = badgeRoot.getAttribute('data-root');
-      activeDeepLinkCode = null;
-      var url = new URL(window.location);
-      url.searchParams.delete('code');
-      url.searchParams.set('section', els.root.value);
-      history.replaceState(null, '', url.toString());
-      runSearch();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
 
     var codeBtn = target.closest('.code-btn');
     if (codeBtn) {
